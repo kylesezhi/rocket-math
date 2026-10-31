@@ -1,4 +1,5 @@
 import type { Problem, WorksheetConfig } from '../types';
+import { random } from '../random';
 
 /**
  * Generate `count` multiplication problems.
@@ -14,7 +15,7 @@ import type { Problem, WorksheetConfig } from '../types';
 export function generateProblems(
   config: WorksheetConfig,
   count: number,
-  rng: () => number,
+  rng: () => number = random,
 ): Problem[] {
   if (!Array.isArray(config.fixedFactors) || config.fixedFactors.length === 0) {
     throw new Error('fixedFactors must contain at least one factor');
@@ -34,3 +35,5 @@ export function generateProblems(
 
   return problems;
 }
+
+export default generateProblems;

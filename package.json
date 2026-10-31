@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest"
-  },
+    "test": "vitest run",
+    "test:watch": "vitest"  },
   "dependencies": {
     "jspdf": "^2.5.2",
     "react": "^19.3.1",
