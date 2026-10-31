@@ -4,8 +4,9 @@ import { random } from '../random';
 /**
  * Generate `count` multiplication problems.
  *
- * The top operand (`a`) is picked from `config.fixedFactors`; the bottom
- * operand (`b`) is a uniformly random integer in `[config.otherMin, config.otherMax]`.
+ * For each problem, one operand is picked from `config.fixedFactors` and the
+ * other operand is a uniformly random integer in `[config.otherMin, config.otherMax]`.
+ * The order (which is on top/bottom) is randomized.
  *
  * Problems are produced in order (left-to-right, top-to-bottom as consumed by
  * the layout). `rng` returns a number in [0, 1).
@@ -28,9 +29,13 @@ export function generateProblems(
   const range = otherMax - otherMin + 1;
 
   for (let i = 0; i < count; i++) {
-    const a = fixedFactors[Math.floor(rng() * fixedFactors.length)];
-    const b = otherMin + Math.floor(rng() * range);
-    problems.push({ a, b });
+    const fixed = fixedFactors[Math.floor(rng() * fixedFactors.length)];
+    const other = otherMin + Math.floor(rng() * range);
+    if (rng() < 0.5) {
+      problems.push({ a: fixed, b: other });
+    } else {
+      problems.push({ a: other, b: fixed });
+    }
   }
 
   return problems;

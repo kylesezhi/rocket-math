@@ -64,18 +64,11 @@ export function generateWorksheet(
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.b), rightX, bottomNumberY, { align: 'right' });
 
-    // Horizontal line across ~80% of cell width
-    const lineX1 = x + cellWidth * 0.1;
-    const lineX2 = x + cellWidth * 0.9;
-    const lineY = y + 0.78;
-    doc.setLineWidth(0.012);
-    doc.line(lineX1, lineY, lineX2, lineY);
-
-    // Rounded answer box below line, centered
-    const boxWidth = cellWidth * 0.75;
+    // Rounded answer box below expression, aligned to right side
+    const boxWidth = cellWidth * 0.8;
     const boxHeight = 0.28;
-    const boxX = x + (cellWidth - boxWidth) / 2;
-    const boxY = lineY + 0.06;
+    const boxX = rightX - boxWidth;
+    const boxY = y + 0.78 + 0.06;
     const radius = 0.06;
     doc.setLineWidth(0.012);
     doc.roundedRect(boxX, boxY, boxWidth, boxHeight, radius, radius, 'S');

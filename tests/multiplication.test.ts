@@ -28,12 +28,20 @@ describe('generateProblems', () => {
     expect(generateProblems(makeConfig([3]), 5, rng)).toHaveLength(5);
   });
 
-  it('all top operands are from the fixedFactors set', () => {
+  it('one operand is from the fixedFactors set and the other is random', () => {
     const rng = () => 0.1;
     const factors = [2, 5, 7];
     const problems = generateProblems(makeConfig(factors), 63, rng);
     for (const p of problems) {
-      expect(factors).toContain(p.a);
+      expect(factors.includes(p.a) || factors.includes(p.b)).toBe(true);
+      if (factors.includes(p.a) && !factors.includes(p.b)) {
+        expect(factors).toContain(p.a);
+      } else if (factors.includes(p.b) && !factors.includes(p.a)) {
+        expect(factors).toContain(p.b);
+      } else {
+        // if somehow both are from factors (possible if other also in factors), just ensure at least one is
+        expect(factors.includes(p.a) || factors.includes(p.b)).toBe(true);
+      }
     }
   });
 
@@ -49,7 +57,12 @@ describe('generateProblems', () => {
 
   it('respects custom otherMin/otherMax range', () => {
     let i = 0;
-    const rng = () => (i++ % 10) / 10;
+    const rng = () => {
+      const val = (i++ % 10) / 10;
+      // For order, make it always put fixed on top for predictable test
+      if (i % 3 === 0) return 0.25;
+      return val;
+    };
     const config: WorksheetConfig = {
       ...makeConfig([3]),
       otherMin: 4,
@@ -57,8 +70,9 @@ describe('generateProblems', () => {
     };
     const problems = generateProblems(config, 63, rng);
     for (const p of problems) {
-      expect(p.b).toBeGreaterThanOrEqual(4);
-      expect(p.b).toBeLessThanOrEqual(8);
+      const other = p.a === 3 ? p.b : p.a;
+      expect(other).toBeGreaterThanOrEqual(4);
+      expect(other).toBeLessThanOrEqual(8);
     }
   });
 
@@ -77,15 +91,22 @@ describe('generateProblems', () => {
     let calls = 0;
     const rng = () => {
       calls += 1;
-      if (calls % 2 === 1) {
-        return Math.floor(calls / 2) % 2 === 0 ? 0 : 0.999;
+      // Use calls to control: odd calls for factor selection, even calls for random operand, next for order
+      if (calls % 3 === 1) {
+        // factor selection
+        return Math.floor(calls / 3) % 2 === 0 ? 0 : 0.999;
+      } else if (calls % 3 === 2) {
+        // random operand
+        return 0.5;
+      } else {
+        // order - make it deterministic
+        return 0.25; // always put fixed on top
       }
-      return 0.5;
     };
     const problems = generateProblems(makeConfig([2, 5]), 20, rng);
-    const aValues = new Set(problems.map((p) => p.a));
-    expect(aValues.has(2)).toBe(true);
-    expect(aValues.has(5)).toBe(true);
+    const factorValues = new Set(problems.flatMap((p) => [p.a, p.b]).filter((v) => v === 2 || v === 5));
+    expect(factorValues.has(2)).toBe(true);
+    expect(factorValues.has(5)).toBe(true);
   });
 
   it('does not mutate the provided config', () => {
@@ -99,9 +120,10 @@ describe('generateProblems', () => {
     const problems = generateProblems(makeConfig([3]), 5);
     expect(problems).toHaveLength(5);
     for (const p of problems) {
-      expect(p.a).toBe(3);
-      expect(p.b).toBeGreaterThanOrEqual(0);
-      expect(p.b).toBeLessThanOrEqual(12);
+      expect(p.a === 3 || p.b === 3).toBe(true);
+      const other = p.a === 3 ? p.b : p.a;
+      expect(other).toBeGreaterThanOrEqual(0);
+      expect(other).toBeLessThanOrEqual(12);
     }
   });
 
