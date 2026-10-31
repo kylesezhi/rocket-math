@@ -1,32 +1,94 @@
-# React + TypeScript + Vite
+# Rocket Math Multiplication Worksheet Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A static, client-side web app built with Vite + React + TypeScript for generating Rocket Math-style multiplication worksheets as PDFs. 
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Instant PDF Generation**: Creates a 7×9 grid (63 problems) of vertical multiplication problems
+- **Customizable Factors**: Select one or more fixed factors (0-12) to practice; the other operand is randomly chosen from 0-12
+- **PDF Preview**: Embedded preview of the generated worksheet before downloading
+- **Randomize**: Generate a new set of random problems with the click of a button
+- **Download as PDF**: Save the worksheet to your device
+- **Persistent Settings**: Your selected factors are saved in localStorage
+- **Clean Layout**: Rocket Math-style vertical format with blank rounded answer boxes, no headers or page numbers
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [Vite](https://vitejs.dev/) - Build tool and dev server
+- [React 19](https://react.dev/) - UI framework
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [jsPDF](https://github.com/parallax/jsPDF) - PDF generation
+- [Vitest](https://vitest.dev/) - Unit testing
+- [Oxlint](https://oxc.rs/) - Linting
 
-## Expanding the Oxlint configuration
+## Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Prerequisites
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- Node.js (version compatible with dependencies)
+- npm or yarn
+
+### Installation
+
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Development
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+### Testing
+
+```bash
+npm test
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## How It Works
+
+1. **Select Factors**: Choose one or more numbers from 0-12 as the fixed factor (appears on top in vertical problems)
+2. **Generate Worksheet**: The app creates 63 random problems where one operand is from your selected factors and the other is randomly chosen from 0-12
+3. **Preview & Download**: View the PDF in the embedded preview or download it directly
+
+## Project Structure
+
+```
+src/
+  components/        # React components (Controls, PdfPreview)
+  lib/
+    generators/      # Problem generation logic
+    pdf/             # PDF layout and generation
+    types.ts         # Type definitions
+    random.ts        # RNG utilities
+    storage.ts       # localStorage persistence
+  App.tsx           # Main application component
+  styles.css        # Application styles
+```
