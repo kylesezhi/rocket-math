@@ -1,0 +1,15 @@
+[tasks.default]
+description = "Start the Vite dev server"
+run = "npm run dev"
+
+[tasks.start]
+description = "Start the Vite dev server"
+run = "npm run dev"
+
+[tasks.build]
+description = "Build the app"
+run = "npm run build"
+
+[tasks.test]
+description = "Run tests"
+run = "npm test"
