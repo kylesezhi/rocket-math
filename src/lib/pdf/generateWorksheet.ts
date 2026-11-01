@@ -37,7 +37,6 @@ export function generateWorksheet(
   const cellWidth = usableWidth / cols;
   const rowGap = 0.16;
   const baseCellHeight = usableHeight / requestedRows;
-  const cellHeight = baseCellHeight + rowGap;
 
   const numberFontSize = 16;
   const timesFontSize = 14;
