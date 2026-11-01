@@ -134,4 +134,75 @@ describe('generateProblems', () => {
       expect(typeof p.b).toBe('number');
     }
   });
+
+  it('does not produce identical ordered pairs adjacent to each other', () => {
+    let call = 0;
+    const rng = () => {
+      call += 1;
+      if (call % 3 === 1) return (call / 10) % 1; // fixed selection varies
+      if (call % 3 === 2) return (call * 0.13) % 1; // other varies
+      return (call % 2 === 0) ? 0.25 : 0.75; // order alternates
+    };
+    const problems = generateProblems(makeConfig([2, 4, 6]), 63, rng);
+    for (let i = 0; i < problems.length - 1; i++) {
+      const p1 = problems[i];
+      const p2 = problems[i + 1];
+      expect(p1.a === p2.a && p1.b === p2.b).toBe(false);
+    }
+  });
+
+  it('after swapped pair (a,b),(b,a) the third does not include both a and b', () => {
+    let call = 0;
+    const rng = () => {
+      call += 1;
+      // Force sequence: (2,0), (0,2), then something else
+      if (call === 1) return 0; // fixed factor selection -> first in [2], fixed=2
+      if (call === 2) return 0; // other = 0
+      if (call === 3) return 0.25; // order -> fixed on top => (2,0)
+      if (call === 4) return 0; // fixed factor selection -> 2
+      if (call === 5) return 0; // other = 0
+      if (call === 6) return 0.75; // order -> other on top => (0,2)
+      if (call === 7) return 0; // fixed factor selection
+      if (call === 8) return 0; // other
+      if (call === 9) return 0.25; // order
+      return 0.5;
+    };
+    const problems = generateProblems(makeConfig([2]), 3, rng);
+    expect(problems[0]).toEqual({ a: 2, b: 0 });
+    expect(problems[1]).toEqual({ a: 0, b: 2 });
+    // third must not include both 2 and 0
+    const third = problems[2];
+    const hasBoth = (third.a === 2 && third.b === 0) || (third.a === 0 && third.b === 2);
+    expect(hasBoth).toBe(false);
+  });
+
+  it('after swapped pair, third does not include both even if generated with different factors', () => {
+    const problems: Array<{ a: number; b: number }> = [
+      { a: 3, b: 4 },
+      { a: 4, b: 3 },
+    ];
+    // simulate by generating with controlled rng to get swap then check
+    let call = 0;
+    const rng = () => {
+      call += 1;
+      if (call === 1) return 0; // fixed = 3
+      if (call === 2) return 4 / 13; // other = 4 (otherMin=0, otherMax=12, range=13)
+      if (call === 3) return 0.25; // order fixed on top => (3,4)
+      if (call === 4) return 0; // fixed = 3
+      if (call === 5) return 4 / 13; // other = 4
+      if (call === 6) return 0.75; // order other on top => (4,3)
+      // third
+      if (call === 7) return 0; // fixed
+      if (call === 8) return 4 / 13; // other
+      if (call === 9) return 0.25; // try to make (3,4)
+      if (call === 10) return 0.75; // try to make (4,3)
+      return 0.1;
+    };
+    const result = generateProblems(makeConfig([3]), 3, rng);
+    expect(result[0]).toEqual({ a: 3, b: 4 });
+    expect(result[1]).toEqual({ a: 4, b: 3 });
+    const third = result[2];
+    const hasBoth = (third.a === 3 && third.b === 4) || (third.a === 4 && third.b === 3);
+    expect(hasBoth).toBe(false);
+  });
 });
