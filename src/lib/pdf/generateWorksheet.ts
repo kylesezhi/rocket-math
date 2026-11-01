@@ -50,9 +50,12 @@ export function generateWorksheet(
     const x = margin + col * cellWidth;
     const y = margin + row * cellHeight;
 
-    const rightX = x + cellWidth - 0.08;
-    const topNumberY = y + 0.32;
-    const bottomNumberY = y + 0.62;
+    const boxWidth = cellWidth * 0.72;
+    const boxX = x + (cellWidth - boxWidth) / 2;
+    const rightX = boxX + boxWidth - 0.08;
+    const leftX = boxX + 0.08;
+    const topNumberY = y + 0.26;
+    const bottomNumberY = y + 0.54;
 
     // Top number (right-aligned)
     doc.setFontSize(numberFontSize);
@@ -60,15 +63,13 @@ export function generateWorksheet(
 
     // Bottom: × on left, number right-aligned
     doc.setFontSize(timesFontSize);
-    doc.text('\u00d7', x + 0.08, bottomNumberY);
+    doc.text('\u00d7', leftX, bottomNumberY);
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.b), rightX, bottomNumberY, { align: 'right' });
 
-    // Rounded answer box below expression, aligned to right side
-    const boxWidth = cellWidth * 0.8;
-    const boxHeight = 0.28;
-    const boxX = rightX - boxWidth;
-    const boxY = y + 0.78 + 0.06;
+    // Rounded answer box below expression, centered
+    const boxHeight = 0.42;
+    const boxY = bottomNumberY + 0.18;
     const radius = 0.06;
     doc.setLineWidth(0.012);
     doc.roundedRect(boxX, boxY, boxWidth, boxHeight, radius, radius, 'S');
