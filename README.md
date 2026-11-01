@@ -4,7 +4,7 @@ A static, client-side web app built with Vite + React + TypeScript for generatin
 
 ## Features
 
-- **Instant PDF Generation**: Creates a 7×9 grid (63 problems) of vertical multiplication problems
+- **Instant PDF Generation**: Creates a 7×8 grid (56 problems) of vertical multiplication problems
 - **Customizable Factors**: Select one or more fixed factors (0-12) to practice; the other operand is randomly chosen from 0-12
 - **PDF Preview**: Embedded preview of the generated worksheet before downloading
 - **Randomize**: Generate a new set of random problems with the click of a button
