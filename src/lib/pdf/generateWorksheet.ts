@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import type { Problem, WorksheetConfig } from '../types';
+import { POPPINS_BOLD, POPPINS_REGULAR } from './fonts';
 
 export interface GenerateWorksheetOptions {
   margin?: number;
@@ -28,6 +29,12 @@ export function generateWorksheet(
     format: 'letter',
   });
 
+  // Register Poppins font
+  doc.addFileToVFS('Poppins-Regular.ttf', POPPINS_REGULAR);
+  doc.addFont('Poppins-Regular.ttf', 'Poppins', 'normal');
+  doc.addFileToVFS('Poppins-Bold.ttf', POPPINS_BOLD);
+  doc.addFont('Poppins-Bold.ttf', 'Poppins', 'bold');
+
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -41,7 +48,7 @@ export function generateWorksheet(
   const numberFontSize = 16;
   const timesFontSize = 14;
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont('Poppins', 'normal');
   doc.setTextColor(0, 0, 0);
   doc.setDrawColor(0, 0, 0);
 
@@ -64,15 +71,15 @@ export function generateWorksheet(
     const bottomNumberY = y + 0.52;
 
     // Top number (right-aligned)
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Poppins', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.a), rightX, topNumberY, { align: 'right' });
 
     // Bottom: × on left, number right-aligned
-    doc.setFont('helvetica', 'normal');
+    doc.setFont('Poppins', 'normal');
     doc.setFontSize(timesFontSize);
     doc.text('\u00d7', leftX, bottomNumberY);
-    doc.setFont('helvetica', 'bold');
+    doc.setFont('Poppins', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.b), rightX, bottomNumberY, { align: 'right' });
 
