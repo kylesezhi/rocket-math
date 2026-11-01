@@ -71,7 +71,7 @@ export function Controls(props: ControlsProps): React.ReactElement {
   return (
     <div className="controls">
       <div className="controls__group">
-        <span className="controls__label">Fixed factor (top):</span>
+        <span className="controls__label">Fixed factor:</span>
         <div className="controls__checkboxes">
           {ALL_FACTORS.map((f) => (
             <label key={f} className="controls__checkbox">
