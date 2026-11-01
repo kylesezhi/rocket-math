@@ -17,7 +17,9 @@ export function generateWorksheet(
   config?: Partial<WorksheetConfig>,
 ): Blob {
   const cols = config?.cols ?? 7;
-  const rows = config?.rows ?? 9;
+  // Allow fewer effective rows to make room for extra margin after each row of boxes
+  const requestedRows = config?.rows ?? 9;
+  const rows = Math.max(1, requestedRows - 1);
   const margin = 0.5;
 
   const doc = new jsPDF({
@@ -33,7 +35,9 @@ export function generateWorksheet(
   const usableHeight = pageHeight - margin * 2;
 
   const cellWidth = usableWidth / cols;
-  const cellHeight = usableHeight / rows;
+  const rowGap = 0.16;
+  const baseCellHeight = usableHeight / requestedRows;
+  const cellHeight = baseCellHeight + rowGap;
 
   const numberFontSize = 16;
   const timesFontSize = 14;
@@ -42,34 +46,40 @@ export function generateWorksheet(
   doc.setTextColor(0, 0, 0);
   doc.setDrawColor(0, 0, 0);
 
-  for (let i = 0; i < problems.length; i++) {
-    const problem = problems[i];
+  const maxProblems = rows * cols;
+  const problemsToDraw = problems.slice(0, maxProblems);
+
+  for (let i = 0; i < problemsToDraw.length; i++) {
+    const problem = problemsToDraw[i];
     const col = i % cols;
     const row = Math.floor(i / cols);
     // guard against rows beyond configured rows: still draw (best effort)
     const x = margin + col * cellWidth;
-    const y = margin + row * cellHeight;
+    const y = margin + row * baseCellHeight + row * rowGap;
 
     const boxWidth = cellWidth * 0.72;
     const boxX = x + (cellWidth - boxWidth) / 2;
     const rightX = boxX + boxWidth - 0.08;
     const leftX = boxX + 0.08;
-    const topNumberY = y + 0.26;
-    const bottomNumberY = y + 0.54;
+    const topNumberY = y + 0.24;
+    const bottomNumberY = y + 0.52;
 
     // Top number (right-aligned)
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.a), rightX, topNumberY, { align: 'right' });
 
     // Bottom: × on left, number right-aligned
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(timesFontSize);
     doc.text('\u00d7', leftX, bottomNumberY);
+    doc.setFont('helvetica', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.b), rightX, bottomNumberY, { align: 'right' });
 
     // Rounded answer box below expression, centered
-    const boxHeight = 0.42;
-    const boxY = bottomNumberY + 0.18;
+    const boxHeight = 0.4;
+    const boxY = bottomNumberY + 0.22;
     const radius = 0.06;
     doc.setLineWidth(0.012);
     doc.roundedRect(boxX, boxY, boxWidth, boxHeight, radius, radius, 'S');
