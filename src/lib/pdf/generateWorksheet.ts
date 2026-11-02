@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import type { Problem, WorksheetConfig } from '../types';
-import { POPPINS_BOLD, POPPINS_REGULAR } from './fonts';
+import { ARIMO_BOLD, POPPINS_BOLD, POPPINS_REGULAR } from './fonts';
 
 export interface GenerateWorksheetOptions {
   margin?: number;
@@ -29,11 +29,13 @@ export function generateWorksheet(
     format: 'letter',
   });
 
-  // Register Poppins font
+  // Register fonts
   doc.addFileToVFS('Poppins-Regular.ttf', POPPINS_REGULAR);
   doc.addFont('Poppins-Regular.ttf', 'Poppins', 'normal');
   doc.addFileToVFS('Poppins-Bold.ttf', POPPINS_BOLD);
   doc.addFont('Poppins-Bold.ttf', 'Poppins', 'bold');
+  doc.addFileToVFS('Arimo-Bold.ttf', ARIMO_BOLD);
+  doc.addFont('Arimo-Bold.ttf', 'Arimo', 'bold');
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -71,7 +73,7 @@ export function generateWorksheet(
     const bottomNumberY = y + 0.52;
 
     // Top number (right-aligned)
-    doc.setFont('Poppins', 'bold');
+    doc.setFont('Arimo', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.a), rightX, topNumberY, { align: 'right' });
 
@@ -79,7 +81,7 @@ export function generateWorksheet(
     doc.setFont('Poppins', 'normal');
     doc.setFontSize(timesFontSize);
     doc.text('\u00d7', leftX, bottomNumberY);
-    doc.setFont('Poppins', 'bold');
+    doc.setFont('Arimo', 'bold');
     doc.setFontSize(numberFontSize);
     doc.text(String(problem.b), rightX, bottomNumberY, { align: 'right' });
 
