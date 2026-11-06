@@ -53,7 +53,7 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 ---
 
 ## Task 3: Implement multiplication problem generator
-**Goal**: Create the core logic to generate 63 vertical multiplication problems with selected fixed factors on top and random bottom factors (0-12).
+**Goal**: Create the core logic to generate 63 vertical multiplication problems with selected fixed factors on top and random bottom factors (1-12).
 
 **Steps**:
 1. Create `src/lib/generators/multiplication.ts`
@@ -70,7 +70,7 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 - [ ] Can import and call `generateProblems` with a test config
 - [ ] With `fixedFactors: [3]`, all generated `a` values are `3`
 - [ ] With `fixedFactors: [2,5]`, all `a` values are either `2` or `5`
-- [ ] All `b` values are between 0-12 inclusive
+- [ ] All `b` values are between 1-12 inclusive
 - [ ] Generating 63 problems returns exactly 63 items
 
 ---
@@ -84,7 +84,7 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 3. Write tests:
    - Returns correct count (63)
    - All top operands are from fixedFactors set
-   - All bottom operands are in [0,12]
+   - All bottom operands are in [1,12]
    - Empty fixedFactors throws an error
    - Distribution reasonably covers both factors when multiple selected (optional but nice)
 4. Add test script to package.json if needed
@@ -138,9 +138,9 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 
 **Steps**:
 1. Create `src/components/Controls.tsx`:
-   - Checkbox group for factors 0-12
+   - Checkbox group for factors 1-12
    - "Select all" and "Clear" buttons/actions
-   - Display "Other factor: 0-12" as read-only
+   - Display "Other factor: 1-12" as read-only
    - Randomize button (disabled if no factors selected)
    - Download PDF button
    - Show inline message "Select at least one operand." when no factors selected
@@ -157,7 +157,7 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 
 **Manual validation**:
 - [ ] Components compile without TypeScript errors
-- [ ] Controls show all checkboxes 0-12
+- [ ] Controls show all checkboxes 1-12
 - [ ] Select all/Clear work as expected
 - [ ] Randomize disabled when nothing selected, enabled when something selected
 - [ ] Message appears when no factors selected
@@ -235,4 +235,4 @@ Each task builds on the previous ones. Complete in order. After each task, perfo
 - All tasks completed with manual validations passing
 - Tests pass (`npm test`)
 - Build succeeds (`npm run build`)
-- App meets all requirements: 7×9 vertical multiplication grid, selectable fixed factors (0-12), random other factors (0-12), Randomize and Download buttons, live PDF preview, no header/name line, plain CSS, client-side only
+- App meets all requirements: 7×9 vertical multiplication grid, selectable fixed factors (1-12), random other factors (1-12), Randomize and Download buttons, live PDF preview, no header/name line, plain CSS, client-side only

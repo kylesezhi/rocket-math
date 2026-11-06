@@ -1,8 +1,8 @@
-const STORAGE_KEY = 'rocket-math:fixedFactors';
+export const STORAGE_KEY = 'rocket-math:fixedFactors';
 const DEFAULT_FACTORS = [3];
 
 function isValidFactor(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 12;
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 12;
 }
 
 export function loadFixedFactors(): number[] {
@@ -24,7 +24,8 @@ export function loadFixedFactors(): number[] {
     for (const f of factors) {
       if (!unique.includes(f)) unique.push(f);
     }
-    return unique.length > 0 ? unique : [...DEFAULT_FACTORS];
+    // A stored array loads as-is after filtering, even if that leaves it empty.
+    return unique;
   } catch {
     return [...DEFAULT_FACTORS];
   }

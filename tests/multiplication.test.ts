@@ -6,7 +6,7 @@ function makeConfig(fixedFactors: number[]): WorksheetConfig {
   return {
     operation: 'multiplication',
     fixedFactors,
-    otherMin: 0,
+    otherMin: 1,
     otherMax: 12,
     cols: 7,
     rows: 9,
@@ -45,13 +45,50 @@ describe('generateProblems', () => {
     }
   });
 
-  it('all bottom operands are within [0, 12]', () => {
-    let i = 0;
-    const rng = () => (i++ % 13) / 13;
+  it('all operands are within [1, 12], and the other operand hits both boundaries 1 and 12', () => {
+    let call = 0;
+    let otherIdx = 0;
+    // Probe values for the other operand, cycled independently of the rng call
+    // order. Under the correct range (otherMin=1, otherMax=12, range=12) they
+    // map to 1, 2, 5, 8, 11, 12 — covering both boundaries. The 0.95 probe is
+    // the regression tripwire: with a broken range (e.g. otherMax=13, range=13)
+    // it maps to 13 and the bound assertion fails; with otherMin=0 it maps the
+    // 0 probe to 0 and the lower bound fails.
+    const otherProbes = [0, 0.125, 0.375, 0.625, 0.875, 0.95];
+    const rng = () => {
+      call += 1;
+      const role = call % 3; // roles per attempt: 1 = fixed factor, 2 = other operand, 0 = order
+      if (role === 1) return 0; // fixedFactors has one element, fixed = 3
+      if (role === 2) return otherProbes[otherIdx++ % otherProbes.length];
+      return 0.25; // order: fixed always on top
+    };
     const problems = generateProblems(makeConfig([3]), 63, rng);
+    const others = new Set(problems.map((p) => (p.a === 3 ? p.b : p.a)));
     for (const p of problems) {
-      expect(p.b).toBeGreaterThanOrEqual(0);
+      expect(p.a).toBeGreaterThanOrEqual(1);
+      expect(p.a).toBeLessThanOrEqual(12);
+      expect(p.b).toBeGreaterThanOrEqual(1);
       expect(p.b).toBeLessThanOrEqual(12);
+    }
+    // Boundary proof: the cycling other counter observed both range ends.
+    expect(others.has(1)).toBe(true);
+    expect(others.has(12)).toBe(true);
+  });
+
+  it('only generates operands in [1, 12] (never 0 or out of range)', () => {
+    let i = 0;
+    // Cycle through many values so all three rng roles (factor, other, order)
+    // see the full range, including values that would yield 0 if otherMin were 0.
+    const rng = () => (i++ % 37) / 37;
+    const problems = generateProblems(makeConfig([2, 3, 5, 7]), 63, rng);
+    expect(problems).toHaveLength(63);
+    for (const p of problems) {
+      expect(p.a).toBeGreaterThanOrEqual(1);
+      expect(p.a).toBeLessThanOrEqual(12);
+      expect(p.b).toBeGreaterThanOrEqual(1);
+      expect(p.b).toBeLessThanOrEqual(12);
+      expect(p.a).not.toBe(0);
+      expect(p.b).not.toBe(0);
     }
   });
 
@@ -122,7 +159,7 @@ describe('generateProblems', () => {
     for (const p of problems) {
       expect(p.a === 3 || p.b === 3).toBe(true);
       const other = p.a === 3 ? p.b : p.a;
-      expect(other).toBeGreaterThanOrEqual(0);
+      expect(other).toBeGreaterThanOrEqual(1);
       expect(other).toBeLessThanOrEqual(12);
     }
   });
@@ -155,47 +192,44 @@ describe('generateProblems', () => {
     let call = 0;
     const rng = () => {
       call += 1;
-      // Force sequence: (2,0), (0,2), then something else
+      // Force sequence: (2,1), (1,2), then something else
       if (call === 1) return 0; // fixed factor selection -> first in [2], fixed=2
-      if (call === 2) return 0; // other = 0
-      if (call === 3) return 0.25; // order -> fixed on top => (2,0)
+      if (call === 2) return 0; // other = 1 (otherMin=1, range=12)
+      if (call === 3) return 0.25; // order -> fixed on top => (2,1)
       if (call === 4) return 0; // fixed factor selection -> 2
-      if (call === 5) return 0; // other = 0
-      if (call === 6) return 0.75; // order -> other on top => (0,2)
+      if (call === 5) return 0; // other = 1
+      if (call === 6) return 0.75; // order -> other on top => (1,2)
       if (call === 7) return 0; // fixed factor selection
       if (call === 8) return 0; // other
       if (call === 9) return 0.25; // order
       return 0.5;
     };
     const problems = generateProblems(makeConfig([2]), 3, rng);
-    expect(problems[0]).toEqual({ a: 2, b: 0 });
-    expect(problems[1]).toEqual({ a: 0, b: 2 });
-    // third must not include both 2 and 0
+    expect(problems[0]).toEqual({ a: 2, b: 1 });
+    expect(problems[1]).toEqual({ a: 1, b: 2 });
+    // third must not include both 2 and 1
     const third = problems[2];
-    const hasBoth = (third.a === 2 && third.b === 0) || (third.a === 0 && third.b === 2);
+    const hasBoth = (third.a === 2 && third.b === 1) || (third.a === 1 && third.b === 2);
     expect(hasBoth).toBe(false);
   });
 
   it('after swapped pair, third does not include both even if generated with different factors', () => {
-    const problems: Array<{ a: number; b: number }> = [
-      { a: 3, b: 4 },
-      { a: 4, b: 3 },
-    ];
     // simulate by generating with controlled rng to get swap then check
     let call = 0;
     const rng = () => {
       call += 1;
       if (call === 1) return 0; // fixed = 3
-      if (call === 2) return 4 / 13; // other = 4 (otherMin=0, otherMax=12, range=13)
+      if (call === 2) return 3 / 12; // other = 4 (otherMin=1, otherMax=12, range=12)
       if (call === 3) return 0.25; // order fixed on top => (3,4)
       if (call === 4) return 0; // fixed = 3
-      if (call === 5) return 4 / 13; // other = 4
+      if (call === 5) return 3 / 12; // other = 4
       if (call === 6) return 0.75; // order other on top => (4,3)
-      // third
+      // third: candidate (3,4) is invalid (contains both swapped elements), so it retries
       if (call === 7) return 0; // fixed
-      if (call === 8) return 4 / 13; // other
-      if (call === 9) return 0.25; // try to make (3,4)
-      if (call === 10) return 0.75; // try to make (4,3)
+      if (call === 8) return 3 / 12; // other
+      if (call === 9) return 0.25; // order fixed on top => candidate (3,4), rejected
+      if (call === 10) return 0; // retry candidate: fixed = 3
+      // retry candidate's other and order fall through to 0.1 below: other = 2, fixed on top => (3,2)
       return 0.1;
     };
     const result = generateProblems(makeConfig([3]), 3, rng);

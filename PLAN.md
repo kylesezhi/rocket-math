@@ -1,7 +1,7 @@
 # Plan: Rocket Math Multiplication Worksheet Generator
 
 ## Goal
-Create a static, client-side web app (Vite + React + TypeScript, plain CSS) that generates a Rocket Math-style multiplication worksheet PDF. The output is a 7×9 grid (63 problems) of vertical multiplication problems with blank rounded answer boxes, an embedded PDF preview, a Randomize button, and a Download PDF button. The user can select one or more fixed factors (e.g., `3` or `2,3,4`) as one operand; the other operand is randomly chosen from 0–12. No header/name line is needed.
+Create a static, client-side web app (Vite + React + TypeScript, plain CSS) that generates a Rocket Math-style multiplication worksheet PDF. The output is a 7×9 grid (63 problems) of vertical multiplication problems with blank rounded answer boxes, an embedded PDF preview, a Randomize button, and a Download PDF button. The user can select one or more fixed factors (e.g., `3` or `2,3,4`) as one operand; the other operand is randomly chosen from 1–12. No header/name line is needed.
 
 ## Tech Stack
 - **Vite + React 18 + TypeScript** (strict)
@@ -43,13 +43,13 @@ type Operation = 'multiplication'; // extensible later
 
 interface Problem {
   a: number; // top operand (from fixed factors)
-  b: number; // bottom operand (random 0-12)
+  b: number; // bottom operand (random 1-12)
 }
 
 interface WorksheetConfig {
   operation: Operation;
-  fixedFactors: number[]; // selected operands (0-12), must be non-empty
-  otherMin: number;      // 0
+  fixedFactors: number[]; // selected operands (1-12), must be non-empty
+  otherMin: number;      // 1
   otherMax: number;      // 12
   cols: number;          // 7
   rows: number;          // 9
@@ -61,7 +61,7 @@ interface WorksheetConfig {
 1. **Validation**: `fixedFactors` must contain at least one number. If empty, Randomize is disabled and an inline message is shown.
 2. **Problem creation**: For each of the 63 cells (top-to-bottom, left-to-right):
    - `a = fixedFactors[Math.floor(rng() * fixedFactors.length)]` (selected factor always on top)
-   - `b = otherMin + Math.floor(rng() * (otherMax - otherMin + 1))` (random 0-12)
+   - `b = otherMin + Math.floor(rng() * (otherMax - otherMin + 1))` (random 1-12 with the app default config)
 3. **Regeneration**: Randomize button increments a `nonce`. Changes to `fixedFactors` also trigger regeneration. A `useEffect` regenerates problems and the PDF whenever `fixedFactors` or `nonce` change.
 4. **RNG**: Use `Math.random()` by default. Structure to allow swapping in a seeded PRNG later without changing callers.
 
@@ -78,8 +78,8 @@ interface WorksheetConfig {
 
 ## UI
 - **Controls component**:
-  - Factor checkbox group for 0–12 (with "Select all / Clear" actions)
-  - Display of other-factor range as read-only text (0–12)
+  - Factor checkbox group for 1–12 (with "Select all / Clear" actions)
+  - Display of other-factor range as read-only text (1–12)
   - `Randomize` button (disabled if no factors selected)
   - `Download PDF` button
 - **PdfPreview component**:
@@ -100,7 +100,7 @@ interface WorksheetConfig {
 - Cleanup object URLs on unmount and regeneration
 
 ## Testing
-- Unit tests for generator: count = 63, all `a` in selected set, `b` in [0,12], empty selection throws/error behavior as specified
+- Unit tests for generator: count = 63, all `a` in selected set, `b` in [1,12], empty selection throws/error behavior as specified
 - Optional: smoke test rendering App
 
 ## Implementation Notes

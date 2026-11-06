@@ -5,7 +5,7 @@ A static, client-side web app built with Vite + React + TypeScript for generatin
 ## Features
 
 - **Instant PDF Generation**: Creates a 7×8 grid (56 problems) of vertical multiplication problems
-- **Customizable Factors**: Select one or more fixed factors (0-12) to practice; the other operand is randomly chosen from 0-12
+- **Customizable Factors**: Select one or more fixed factors (1-12) to practice; the other operand is randomly chosen from 1-12
 - **PDF Preview**: Embedded preview of the generated worksheet before downloading
 - **Randomize**: Generate a new set of random problems with the click of a button
 - **Download as PDF**: Save the worksheet to your device
@@ -74,8 +74,8 @@ npm run lint
 
 ## How It Works
 
-1. **Select Factors**: Choose one or more numbers from 0-12 as the fixed factor (appears on top in vertical problems)
-2. **Generate Worksheet**: The app creates 63 random problems where one operand is from your selected factors and the other is randomly chosen from 0-12
+1. **Select Factors**: Choose one or more numbers from 1-12 as the fixed factor (appears on top in vertical problems)
+2. **Generate Worksheet**: The app creates 63 random problems where one operand is from your selected factors and the other is randomly chosen from 1-12
 3. **Preview & Download**: View the PDF in the embedded preview or download it directly
 
 ## Project Structure

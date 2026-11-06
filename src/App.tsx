@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Controls } from './components/Controls';
 import { PdfPreview } from './components/PdfPreview';
+import { BASE_CONFIG } from './lib/config';
 import { generateProblems } from './lib/generators/multiplication';
 import { generateWorksheet } from './lib/pdf/generateWorksheet';
 import { loadFixedFactors, saveFixedFactors } from './lib/storage';
 import type { Problem, WorksheetConfig } from './lib/types';
-
-const BASE_CONFIG = {
-  operation: 'multiplication' as const,
-  otherMin: 0,
-  otherMax: 12,
-  cols: 7,
-  rows: 9,
-  title: 'Multiplication Practice',
-};
 
 function App(): React.ReactElement {
   const [fixedFactors, setFixedFactors] = useState<number[]>(() => loadFixedFactors());

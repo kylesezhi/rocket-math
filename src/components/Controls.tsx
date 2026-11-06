@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ALL_FACTORS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const ALL_FACTORS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 export interface ControlsProps {
   /** Selected fixed factors (aliases supported: selectedFactors, factors). */
@@ -96,7 +96,7 @@ export function Controls(props: ControlsProps): React.ReactElement {
       </div>
 
       <div className="controls__readonly">
-        Other factor: 0-12
+        Other factor: 1-12
       </div>
 
       {noFactors && (
