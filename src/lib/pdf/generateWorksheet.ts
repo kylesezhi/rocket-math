@@ -219,7 +219,7 @@ export function generateWorksheet(
   doc.setFillColor(BLACK, BLACK, BLACK);
 
   // ---- Header ----
-  doc.addImage(ROCKET_LOGO, 'PNG', 0.16, 0.05, 1.3, 0.95);
+  doc.addImage(ROCKET_LOGO, 'PNG', 0.16, 0.05, 1.3, 1.043);
 
   doc.setFont('Poppins', 'bold');
   doc.setFontSize(33);
@@ -368,8 +368,9 @@ export function generateWorksheet(
     }
   }
 
-  // Small rocket trail decoration, bottom right
-  doc.addImage(MINI_ROCKET, 'PNG', 6.65, 10.56, 1.45, 0.35);
+  // Small rocket trail decoration, bottom right (gap left below footer so the
+  // opaque image edge never touches the SCORE box border)
+  doc.addImage(MINI_ROCKET, 'PNG', 6.65, 10.61, 1.45, 0.335);
 
   return doc.output('blob');
 }
