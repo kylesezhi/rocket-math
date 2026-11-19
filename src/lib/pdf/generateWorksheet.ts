@@ -80,7 +80,11 @@ function drawBadge(doc: jsPDF, cx: number, cy: number, w: number, h: number, lab
   doc.setFont('Poppins', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(WHITE, WHITE, WHITE);
-  doc.text(label, cx, cy + 0.045, { align: 'center', charSpace: 2.2 * PT });
+  const tracking = 2.2 * PT;
+  // jsPDF doesn't account for charSpace when centering, which shifts tracked
+  // text to the right — center manually with left alignment instead.
+  const labelWidth = trackedTextWidth(doc, label, tracking);
+  doc.text(label, cx - labelWidth / 2, cy + 0.045, { align: 'left', charSpace: tracking });
   doc.setTextColor(BLACK, BLACK, BLACK);
 }
 
