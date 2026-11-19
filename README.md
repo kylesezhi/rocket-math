@@ -10,7 +10,7 @@ A static, client-side web app built with Vite + React + TypeScript for generatin
 - **Randomize**: Generate a new set of random problems with the click of a button
 - **Download as PDF**: Save the worksheet to your device
 - **Persistent Settings**: Your selected factors are saved in localStorage
-- **Blast Off! Layout**: Styled after the "Blast Off! Multiplication Drill" sheet — branded header with rocket logo and Name line, a "TIMED TEST" badge over a rounded problem frame, and a footer with TIME / GOAL / SCORE boxes
+- **Blast Off! Layout**: Styled after the "Blast Off! Multiplication Drill" sheet — branded header with rocket logo and Name line, a "TIMED TEST" badge over a rounded problem frame, and a footer motto with a mini rocket
 
 ## Tech Stack
 

@@ -48,45 +48,6 @@ function drawSparkle(doc: jsPDF, cx: number, cy: number, r: number): void {
   polygon(doc, starPoints(cx, cy, r, r * 0.26, 4), 'F');
 }
 
-/** Stopwatch icon: circle body, top knob, side button, two hands. */
-function drawStopwatch(doc: jsPDF, cx: number, cy: number, r: number): void {
-  doc.setLineWidth(0.016);
-  // Top knob and stem
-  doc.roundedRect(cx - 0.045, cy - r - 0.095, 0.09, 0.055, 0.015, 0.015, 'F');
-  doc.rect(cx - 0.02, cy - r - 0.045, 0.04, 0.05, 'F');
-  // Side button (~2 o'clock)
-  doc.setLineWidth(0.022);
-  doc.line(cx + r * 0.72, cy - r * 0.72, cx + r * 0.92, cy - r * 0.92);
-  // Body
-  doc.setLineWidth(0.016);
-  doc.circle(cx, cy, r, 'S');
-  // Hands: 12 o'clock and ~4:30
-  doc.line(cx, cy, cx, cy - r * 0.58);
-  doc.line(cx, cy, cx + r * 0.38, cy + r * 0.32);
-  doc.circle(cx, cy, 0.018, 'F');
-}
-
-/** Checkered racing flag on a pole (flag at top-left of the pole). */
-function drawCheckeredFlag(doc: jsPDF, x: number, y: number, w: number, h: number): void {
-  const poleX = x;
-  // Pole
-  doc.setLineWidth(0.022);
-  doc.line(poleX, y - 0.01, poleX, y + h + 0.11);
-  doc.circle(poleX, y - 0.02, 0.02, 'F');
-  // Flag cloth
-  doc.setLineWidth(0.012);
-  doc.rect(x, y, w, h, 'S');
-  const cols = 4;
-  const rows = 3;
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if ((r + c) % 2 === 0) {
-        doc.rect(x + (c * w) / cols, y + (r * h) / rows, w / cols, h / rows, 'F');
-      }
-    }
-  }
-}
-
 /** Elongated hexagon badge with pointed ends, white inner outline, label and sparkles. */
 function drawBadge(doc: jsPDF, cx: number, cy: number, w: number, h: number, label: string): void {
   const hex = (width: number, height: number): Vec[] => {
@@ -141,52 +102,13 @@ function trackedTextWidth(doc: jsPDF, text: string, charSpace: number): number {
   return doc.getTextWidth(text) + charSpace * Math.max(0, text.length - 1);
 }
 
-/** Footer box: rounded rect with an icon, bold label, and fill-in line segments. */
-function drawFooterBox(
-  doc: jsPDF,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  drawIcon: (iconX: number, centerY: number) => number,
-  label: string,
-  segments: Array<'line' | string>,
-): void {
-  const radius = 0.08;
-  doc.setLineWidth(0.014);
-  doc.roundedRect(x, y, w, h, radius, radius, 'S');
-
-  const centerY = y + h / 2;
-  const baseline = centerY + 0.04;
-  let cursor = drawIcon(x + 0.14, centerY);
-
-  doc.setFont('Poppins', 'bold');
-  doc.setFontSize(11);
-  doc.text(label, cursor, baseline);
-  cursor += doc.getTextWidth(label) + 0.09;
-
-  doc.setFont('Poppins', 'normal');
-  doc.setFontSize(10);
-  const lineY = y + h - 0.1;
-  for (const segment of segments) {
-    if (segment === 'line') {
-      doc.setLineWidth(0.012);
-      doc.line(cursor, lineY, cursor + 0.42, lineY);
-      cursor += 0.42 + 0.08;
-    } else {
-      doc.text(segment, cursor, baseline);
-      cursor += doc.getTextWidth(segment) + 0.08;
-    }
-  }
-}
-
 /**
  * Generate a "Blast Off!"-style multiplication drill worksheet PDF.
  *
  * Layout: Letter portrait with a branded header (logo, title, Name line),
  * a dotted separator, a "TIMED TEST" badge overlapping a large rounded
  * frame that holds 7 columns x 8 rows of vertical multiplication problems,
- * and a footer with TIME / GOAL / SCORE boxes and a motto.
+ * and a footer with a motto and a small rocket.
  */
 export function generateWorksheet(
   problems: Problem[],
@@ -307,44 +229,6 @@ export function generateWorksheet(
   // ---- TIMED TEST badge (overlaps the frame's top edge) ----
   drawBadge(doc, centerX, boxY, 2.32, 0.34, 'TIMED TEST');
 
-  // ---- Footer ----
-  const footerY = 10.22;
-  const footerH = 0.34;
-
-  drawStopwatch(doc, 0.62, footerY + footerH / 2, 0.16);
-  drawFooterBox(doc, 0.88, footerY, 2.35, footerH, (iconX) => iconX, 'TIME:', [
-    'line',
-    'min',
-    'line',
-    'sec',
-  ]);
-  drawFooterBox(
-    doc,
-    3.5,
-    footerY,
-    2.32,
-    footerH,
-    (iconX, centerY) => {
-      drawCheckeredFlag(doc, iconX + 0.02, centerY - 0.12, 0.24, 0.15);
-      return iconX + 0.36;
-    },
-    'GOAL:',
-    ['line', 'or fewer'],
-  );
-  drawFooterBox(
-    doc,
-    6.08,
-    footerY,
-    2.06,
-    footerH,
-    (iconX, centerY) => {
-      drawStar(doc, iconX + 0.09, centerY, 0.095);
-      return iconX + 0.26;
-    },
-    'SCORE:',
-    ['line', `/ ${problemsToDraw.length}`],
-  );
-
   // ---- Motto ----
   doc.setFont('Poppins', 'bold');
   doc.setFontSize(10);
@@ -358,7 +242,7 @@ export function generateWorksheet(
   }
   mottoWidth += (mottoParts.length - 1) * (2 * starGap + starR * 2);
   let cursor = centerX - mottoWidth / 2;
-  const mottoBaseline = 10.86;
+  const mottoBaseline = 10.5;
   for (let i = 0; i < mottoParts.length; i++) {
     doc.text(mottoParts[i], cursor, mottoBaseline, { charSpace: mottoSpace });
     cursor += trackedTextWidth(doc, mottoParts[i], mottoSpace);
@@ -368,9 +252,9 @@ export function generateWorksheet(
     }
   }
 
-  // Small rocket trail decoration, bottom right (gap left below footer so the
-  // opaque image edge never touches the SCORE box border)
-  doc.addImage(MINI_ROCKET, 'PNG', 6.65, 10.61, 1.45, 0.335);
+  // Small rocket trail decoration, bottom right (kept below the motto baseline
+  // so the opaque image edge never touches the motto text)
+  doc.addImage(MINI_ROCKET, 'PNG', 6.65, 10.25, 1.45, 0.335);
 
   return doc.output('blob');
 }
